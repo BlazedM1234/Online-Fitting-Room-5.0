@@ -1,0 +1,65 @@
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+// Add lighting
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+scene.add(ambientLight);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+directionalLight.position.set(1, 1, 1).normalize();
+scene.add(directionalLight);
+
+// Load your 3D model
+const loader = new THREE.GLTFLoader();
+let model;
+
+loader.load('https://BlazedM1234.github.io/Online-Fitting-Room-5.0/men-model-6.glb', function (gltf) {
+    model = gltf.scene;
+    scene.add(model);
+    camera.position.z = 5;
+    animate();
+});
+
+// Function to update model color
+function updateModelColor(color) {
+    if (model) {
+        model.traverse((child) => {
+            if (child.isMesh) {
+                child.material.color.set(color); // Apply the color to the model
+            }
+        });
+    }
+}
+
+// Event listeners for inputs
+document.getElementById('colorPicker').addEventListener('input', (event) => {
+    updateModelColor(event.target.value);
+});
+
+document.getElementById('heightInput').addEventListener('input', (event) => {
+    const heightValue = parseFloat(event.target.value);
+    if (model) {
+        model.scale.y = heightValue / 180; // Adjust height based on the input
+    }
+});
+
+document.getElementById('widthInput').addEventListener('input', (event) => {
+    const widthValue = parseFloat(event.target.value);
+    if (model) {
+        model.scale.x = widthValue / 50; // Adjust width based on the input
+    }
+});
+
+document.getElementById('weightInput').addEventListener('input', (event) => {
+    const weightValue = parseFloat(event.target.value);
+    // Implement functionality for weight if needed
+    console.log('Weight:', weightValue);
+});
+
+// Animation loop
+function animate() {
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
+}
